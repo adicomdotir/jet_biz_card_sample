@@ -24,18 +24,25 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ir.adicom.jedbizcard.ui.theme.JedBizCardTheme
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.runtime.MutableState
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import ir.adicom.jedbizcard.components.InputField
 
 class MainActivity : ComponentActivity() {
+    @ExperimentalComposeUiApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             JedBizCardTheme {
                 // A surface container using the 'background' color from the theme
                 MyApp {
-                    TopHeader()
+//                    TopHeader()
+                    MainContent()
                 }
             }
         }
@@ -77,6 +84,40 @@ fun TopHeader(totalPerPerson: Double = 0.0) {
                 text = "$$total",
                 style = MaterialTheme.typography.h4,
                 fontWeight = FontWeight.Bold
+            )
+        }
+    }
+}
+
+@ExperimentalComposeUiApi
+@Preview
+@Composable
+fun MainContent() {
+    val totalBillState = remember {
+        mutableStateOf("")
+    }
+    val validState = remember(totalBillState.value) {
+        totalBillState.value.trim().isNotEmpty()
+    }
+    val keyboardController = LocalSoftwareKeyboardController.current
+    Surface(
+        modifier = Modifier
+            .padding(2.dp)
+            .fillMaxWidth(),
+        shape = RoundedCornerShape(corner = CornerSize(8.dp)),
+        border = BorderStroke(2.dp, Color.LightGray)
+    ) {
+        Column {
+            InputField(
+                valueState = totalBillState,
+                labelId = "Enter Bill",
+                enabled = true,
+                isSingleLine = true,
+                onAction = KeyboardActions {
+                    if (!validState) return@KeyboardActions
+
+                    keyboardController?.hide()
+                }
             )
         }
     }
