@@ -36,6 +36,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import ir.adicom.jedbizcard.components.InputField
+import ir.adicom.jedbizcard.util.calculateTotalTip
 import ir.adicom.jedbizcard.widgets.RoundIconButton
 
 class MainActivity : ComponentActivity() {
@@ -64,12 +65,12 @@ fun MyApp(content: @Composable () -> Unit) {
     }
 }
 
-@Preview
 @Composable
 fun TopHeader(totalPerPerson: Double = 0.0) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(15.dp)
             .height(150.dp)
             .clip(
                 shape = RoundedCornerShape(
@@ -115,7 +116,18 @@ fun BillForm(
     val validState = remember(totalBillState.value) {
         totalBillState.value.trim().isNotEmpty()
     }
+    val sliderPositionState = remember {
+        mutableStateOf(0f)
+    }
+    val splitByState = remember {
+        mutableStateOf(1)
+    }
+    val tipAmountState = remember {
+        mutableStateOf(0.0)
+    }
+    val tipPercentage = (sliderPositionState.value * 100).toInt()
     val keyboardController = LocalSoftwareKeyboardController.current
+    TopHeader()
     Surface(
         modifier = Modifier
             .padding(2.dp)
@@ -153,15 +165,54 @@ fun BillForm(
                         modifier = Modifier.padding(horizontal = 3.dp),
                         horizontalArrangement = Arrangement.End
                     ) {
-                        RoundIconButton(imageVector = Icons.Default.Remove, onClick = { /*TODO*/ })
+                        RoundIconButton(imageVector = Icons.Default.Remove, onClick = {
+                            if (splitByState.value > 1) {
+                                splitByState.value -= 1;
+                            }
+                        })
                         Text(
-                            text = "2",
+                            text = "${splitByState.value}",
                             modifier = Modifier
                                 .padding(start = 9.dp, end = 9.dp)
                                 .align(Alignment.CenterVertically)
                         )
-                        RoundIconButton(imageVector = Icons.Default.Add, onClick = { /*TODO*/ })
+                        RoundIconButton(imageVector = Icons.Default.Add, onClick = {
+                            if (splitByState.value < 100) {
+                                splitByState.value += 1
+                            }
+                        })
                     }
+                }
+                Row(modifier = Modifier.padding(horizontal = 3.dp, vertical = 12.dp)) {
+                    Text(
+                        text = "Tip",
+                        modifier = Modifier.align(alignment = Alignment.CenterVertically)
+                    )
+                    Spacer(modifier = Modifier.width(200.dp))
+                    Text(
+                        text = "$${tipAmountState.value}",
+                        modifier = Modifier.align(alignment = Alignment.CenterVertically)
+                    )
+                }
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(text = "$tipPercentage%")
+                    Spacer(modifier = Modifier.height(14.dp))
+                    Slider(
+                        value = sliderPositionState.value,
+                        onValueChange = {
+                            sliderPositionState.value = it
+                            tipAmountState.value = calculateTotalTip(
+                                totalBillState.value.toDouble(),
+                                tipPercentage = tipPercentage
+                            )
+                        },
+                        onValueChangeFinished = {},
+                        modifier = Modifier.padding(start = 16.dp, end = 16.dp),
+                        steps = 5
+                    )
                 }
             } else {
                 Box {
