@@ -1,5 +1,6 @@
 package ir.adicom.jedbizcard.components
 
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -46,6 +47,6 @@ fun InputField(
         keyboardActions = onAction,
         modifier = modifier.padding(
             bottom = 10.dp, start = 10.dp, end = 10.dp
-        )
+        ).fillMaxWidth()
     )
 }

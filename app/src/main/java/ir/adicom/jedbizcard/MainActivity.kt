@@ -1,6 +1,7 @@
 package ir.adicom.jedbizcard
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
@@ -25,6 +26,9 @@ import androidx.compose.ui.unit.dp
 import ir.adicom.jedbizcard.ui.theme.JedBizCardTheme
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.draw.clip
@@ -32,6 +36,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import ir.adicom.jedbizcard.components.InputField
+import ir.adicom.jedbizcard.widgets.RoundIconButton
 
 class MainActivity : ComponentActivity() {
     @ExperimentalComposeUiApi
@@ -93,6 +98,17 @@ fun TopHeader(totalPerPerson: Double = 0.0) {
 @Preview
 @Composable
 fun MainContent() {
+    BillForm() { billAmt ->
+        Log.e("TAG", "MainContent: $billAmt")
+    }
+}
+
+@ExperimentalComposeUiApi
+@Composable
+fun BillForm(
+    modifier: Modifier = Modifier,
+    onValChange: (String) -> Unit = {}
+) {
     val totalBillState = remember {
         mutableStateOf("")
     }
@@ -105,9 +121,13 @@ fun MainContent() {
             .padding(2.dp)
             .fillMaxWidth(),
         shape = RoundedCornerShape(corner = CornerSize(8.dp)),
-        border = BorderStroke(2.dp, Color.LightGray)
+        border = BorderStroke(2.dp, Color.LightGray),
     ) {
-        Column {
+        Column(
+            modifier = Modifier.padding(6.dp),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.Start
+        ) {
             InputField(
                 valueState = totalBillState,
                 labelId = "Enter Bill",
@@ -115,10 +135,39 @@ fun MainContent() {
                 isSingleLine = true,
                 onAction = KeyboardActions {
                     if (!validState) return@KeyboardActions
-
+                    onValChange(totalBillState.value)
                     keyboardController?.hide()
                 }
             )
+            if (validState) {
+                Row(
+                    modifier = Modifier.padding(3.dp),
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    Text(
+                        text = "Split",
+                        modifier = Modifier.align(alignment = Alignment.CenterVertically)
+                    )
+                    Spacer(modifier = Modifier.width(120.dp))
+                    Row(
+                        modifier = Modifier.padding(horizontal = 3.dp),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        RoundIconButton(imageVector = Icons.Default.Remove, onClick = { /*TODO*/ })
+                        Text(
+                            text = "2",
+                            modifier = Modifier
+                                .padding(start = 9.dp, end = 9.dp)
+                                .align(Alignment.CenterVertically)
+                        )
+                        RoundIconButton(imageVector = Icons.Default.Add, onClick = { /*TODO*/ })
+                    }
+                }
+            } else {
+                Box {
+
+                }
+            }
         }
     }
 }
