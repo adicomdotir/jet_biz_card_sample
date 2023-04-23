@@ -36,6 +36,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import ir.adicom.jedbizcard.components.InputField
+import ir.adicom.jedbizcard.util.calculateTotalPerPerson
 import ir.adicom.jedbizcard.util.calculateTotalTip
 import ir.adicom.jedbizcard.widgets.RoundIconButton
 
@@ -61,7 +62,9 @@ fun MyApp(content: @Composable () -> Unit) {
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colors.background
     ) {
-        content()
+        Column {
+            content()
+        }
     }
 }
 
@@ -96,7 +99,6 @@ fun TopHeader(totalPerPerson: Double = 0.0) {
 }
 
 @ExperimentalComposeUiApi
-@Preview
 @Composable
 fun MainContent() {
     BillForm() { billAmt ->
@@ -125,9 +127,12 @@ fun BillForm(
     val tipAmountState = remember {
         mutableStateOf(0.0)
     }
+    val totalPerPersonState = remember {
+        mutableStateOf(0.0)
+    }
     val tipPercentage = (sliderPositionState.value * 100).toInt()
     val keyboardController = LocalSoftwareKeyboardController.current
-    TopHeader()
+    TopHeader(totalPerPerson = totalPerPersonState.value)
     Surface(
         modifier = Modifier
             .padding(2.dp)
@@ -168,6 +173,11 @@ fun BillForm(
                         RoundIconButton(imageVector = Icons.Default.Remove, onClick = {
                             if (splitByState.value > 1) {
                                 splitByState.value -= 1;
+                                totalPerPersonState.value = calculateTotalPerPerson(
+                                    totalBill = totalBillState.value.toDouble(),
+                                    splitBy = splitByState.value,
+                                    tipPercentage = tipPercentage
+                                )
                             }
                         })
                         Text(
@@ -179,6 +189,11 @@ fun BillForm(
                         RoundIconButton(imageVector = Icons.Default.Add, onClick = {
                             if (splitByState.value < 100) {
                                 splitByState.value += 1
+                                totalPerPersonState.value = calculateTotalPerPerson(
+                                    totalBill = totalBillState.value.toDouble(),
+                                    splitBy = splitByState.value,
+                                    tipPercentage = tipPercentage
+                                )
                             }
                         })
                     }
@@ -208,6 +223,11 @@ fun BillForm(
                                 totalBillState.value.toDouble(),
                                 tipPercentage = tipPercentage
                             )
+                            totalPerPersonState.value = calculateTotalPerPerson(
+                                totalBill = totalBillState.value.toDouble(),
+                                splitBy = splitByState.value,
+                                tipPercentage = tipPercentage
+                            )
                         },
                         onValueChangeFinished = {},
                         modifier = Modifier.padding(start = 16.dp, end = 16.dp),
@@ -223,12 +243,13 @@ fun BillForm(
     }
 }
 
+@ExperimentalComposeUiApi
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
     JedBizCardTheme {
         MyApp {
-            TopHeader()
+            MainContent()
         }
     }
 }
