@@ -59,7 +59,9 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MyApp(content: @Composable () -> Unit) {
     Surface(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(12.dp),
         color = MaterialTheme.colors.background
     ) {
         Column {
@@ -101,15 +103,29 @@ fun TopHeader(totalPerPerson: Double = 0.0) {
 @ExperimentalComposeUiApi
 @Composable
 fun MainContent() {
-    BillForm() { billAmt ->
-        Log.e("TAG", "MainContent: $billAmt")
+    val splitByState = remember {
+        mutableStateOf(1)
     }
+    val tipAmountState = remember {
+        mutableStateOf(0.0)
+    }
+    val totalPerPersonState = remember {
+        mutableStateOf(0.0)
+    }
+    BillForm(
+        splitByState = splitByState,
+        tipAmountState = tipAmountState,
+        totalPerPersonState = totalPerPersonState
+    ) {}
 }
 
 @ExperimentalComposeUiApi
 @Composable
 fun BillForm(
     modifier: Modifier = Modifier,
+    splitByState: MutableState<Int>,
+    tipAmountState: MutableState<Double>,
+    totalPerPersonState: MutableState<Double>,
     onValChange: (String) -> Unit = {}
 ) {
     val totalBillState = remember {
@@ -121,20 +137,12 @@ fun BillForm(
     val sliderPositionState = remember {
         mutableStateOf(0f)
     }
-    val splitByState = remember {
-        mutableStateOf(1)
-    }
-    val tipAmountState = remember {
-        mutableStateOf(0.0)
-    }
-    val totalPerPersonState = remember {
-        mutableStateOf(0.0)
-    }
+
     val tipPercentage = (sliderPositionState.value * 100).toInt()
     val keyboardController = LocalSoftwareKeyboardController.current
     TopHeader(totalPerPerson = totalPerPersonState.value)
     Surface(
-        modifier = Modifier
+        modifier = modifier
             .padding(2.dp)
             .fillMaxWidth(),
         shape = RoundedCornerShape(corner = CornerSize(8.dp)),
