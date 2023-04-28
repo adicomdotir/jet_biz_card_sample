@@ -11,10 +11,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import ir.adicom.jedbizcard.screens.home.MainContent
+import ir.adicom.jedbizcard.model.Movie
+import ir.adicom.jedbizcard.model.getMovies
 
 @Composable
-fun DetailScreen(navController: NavController, movie: String?) {
+fun DetailScreen(navController: NavController, movieId: String?) {
+    val movie = getMovies().first { movie -> movie.id == movieId }
+
     Scaffold(topBar = {
         TopAppBar(backgroundColor = Color.LightGray, elevation = 5.dp) {
             Row(
@@ -41,7 +44,7 @@ fun DetailScreen(navController: NavController, movie: String?) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                Text(text = movie.toString(), style = MaterialTheme.typography.h5)
+                Text(text = movie.title, style = MaterialTheme.typography.h5)
                 Spacer(modifier = Modifier.height(23.dp))
                 Button(onClick = { navController.popBackStack() }) {
                     Text(text = "Go Back")
