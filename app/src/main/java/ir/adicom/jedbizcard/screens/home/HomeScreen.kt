@@ -21,7 +21,7 @@ import ir.adicom.jedbizcard.navigation.MovieScreens
 @Composable
 fun HomeScreen(navController: NavController) {
     Scaffold(topBar = {
-        TopAppBar(backgroundColor = Color.Magenta, elevation = 5.dp) {
+        TopAppBar(backgroundColor = Color.LightGray, elevation = 5.dp) {
             Text(text = "Movie")
         }
     }) {
@@ -37,7 +37,7 @@ fun MainContent(
         LazyColumn {
             items(movieList) {
                 MovieRow(movie = it) {
-                    navController.navigate(MovieScreens.DetailScreen.name)
+                    navController.navigate(MovieScreens.DetailScreen.name + "/$it")
                 }
             }
         }
