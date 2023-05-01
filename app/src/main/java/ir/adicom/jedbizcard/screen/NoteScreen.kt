@@ -28,6 +28,7 @@ import ir.adicom.jedbizcard.components.NoteButton
 import ir.adicom.jedbizcard.components.NoteInputText
 import ir.adicom.jedbizcard.data.NoteDataSource
 import ir.adicom.jedbizcard.model.Note
+import ir.adicom.jedbizcard.util.formatDate
 import java.time.format.DateTimeFormatter
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -124,10 +125,10 @@ fun NoteRow(
         ) {
             Text(text = note.title, style = MaterialTheme.typography.subtitle2)
             Text(text = note.description, style = MaterialTheme.typography.subtitle1)
-//            Text(
-//                text = note.entryDate.format(DateTimeFormatter.ofPattern("EEE, d MMM")),
-//                style = MaterialTheme.typography.caption
-//            )
+            Text(
+                text = formatDate(note.entryDate.time),
+                style = MaterialTheme.typography.caption
+            )
         }
     }
 }
