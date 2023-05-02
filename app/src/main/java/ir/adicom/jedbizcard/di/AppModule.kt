@@ -1,14 +1,14 @@
 package ir.adicom.jedbizcard.di
 
-import android.content.Context
-import androidx.room.Room
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import ir.adicom.jedbizcard.data.NoteDatabase
-import ir.adicom.jedbizcard.data.NoteDatabaseDao
+import ir.adicom.jedbizcard.network.QuestionApi
+import ir.adicom.jedbizcard.util.Constants
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.create
 import javax.inject.Singleton
 
 @Module
@@ -16,11 +16,12 @@ import javax.inject.Singleton
 object AppModule {
     @Singleton
     @Provides
-    fun provideNotesDao(noteDatabase: NoteDatabase): NoteDatabaseDao = noteDatabase.noteDao()
-
-    @Singleton
-    @Provides
-    fun provideAppDatabase(@ApplicationContext context: Context): NoteDatabase =
-        Room.databaseBuilder(context, NoteDatabase::class.java, "notes_db")
-            .fallbackToDestructiveMigration().build()
+    fun provideQuestion(): QuestionApi {
+        return Retrofit
+            .Builder()
+            .baseUrl(Constants.BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(QuestionApi::class.java)
+    }
 }
