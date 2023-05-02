@@ -5,6 +5,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import ir.adicom.jedbizcard.network.QuestionApi
+import ir.adicom.jedbizcard.repository.QuestionRepository
 import ir.adicom.jedbizcard.util.Constants
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -14,6 +15,11 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+
+    @Singleton
+    @Provides
+    fun provideQuestionRepository(api: QuestionApi) = QuestionRepository(api)
+
     @Singleton
     @Provides
     fun provideQuestion(): QuestionApi {

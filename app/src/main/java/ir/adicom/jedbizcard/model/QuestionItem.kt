@@ -1,4 +1,4 @@
-package ir.adicom.jedbizcard.data
+package ir.adicom.jedbizcard.model
 
 
 import com.google.gson.annotations.SerializedName

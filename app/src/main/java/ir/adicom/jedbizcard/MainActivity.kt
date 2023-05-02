@@ -7,6 +7,7 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import dagger.hilt.android.AndroidEntryPoint
+import ir.adicom.jedbizcard.screens.TriviaHome
 import ir.adicom.jedbizcard.ui.theme.JedBizCardTheme
 
 @AndroidEntryPoint
@@ -16,6 +17,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             JedBizCardTheme {
                 Surface {
+                    TriviaHome()
                 }
             }
         }
