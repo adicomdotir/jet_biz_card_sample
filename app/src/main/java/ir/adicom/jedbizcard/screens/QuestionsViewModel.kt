@@ -21,7 +21,7 @@ class QuestionsViewModel @Inject constructor(private val repository: QuestionRep
         )
 
     init {
-        Log.e("TAG", "INIt")
+        Log.e("TAG", "init")
         getAllQuestions()
     }
 
@@ -29,9 +29,9 @@ class QuestionsViewModel @Inject constructor(private val repository: QuestionRep
         viewModelScope.launch {
             data.value.loading = true
 
-            Log.e("TAG", "BEfor get")
+            Log.e("TAG", "view model before")
             data.value = repository.getAllQuestions()
-            Log.e("TAG", data.value.data?.size.toString())
+            Log.e("TAG", "view model getAllQuestions")
             if (data.value.data.toString().isNotEmpty()) {
                 data.value.loading = false
             }

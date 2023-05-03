@@ -22,6 +22,7 @@ class QuestionRepository @Inject constructor(private val api: QuestionApi) {
             Log.e("TAG", "catch error : ${exception.message}")
             dataOrException.e = exception
         }
+        Log.e("TAG", "before return")
         return dataOrException
     }
 }
