@@ -1,4 +1,4 @@
-package ir.adicom.jedbizcard.util
+package ir.adicom.jedbizcard.utils
 
 import androidx.compose.ui.graphics.Color
 
