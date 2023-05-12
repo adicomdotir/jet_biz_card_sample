@@ -17,7 +17,7 @@ data class WeatherItem(
     @SerializedName("humidity")
     val humidity: Int,
     @SerializedName("pop")
-    val pop: Int,
+    val pop: Double,
     @SerializedName("pressure")
     val pressure: Int,
     @SerializedName("speed")

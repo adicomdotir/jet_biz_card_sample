@@ -1,10 +1,12 @@
 package ir.adicom.jedbizcard.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import ir.adicom.jedbizcard.screens.main.MainScreen
+import ir.adicom.jedbizcard.screens.main.MainViewModel
 import ir.adicom.jedbizcard.screens.splash.WeatherSplashScreen
 
 @Composable
@@ -15,7 +17,8 @@ fun WeatherNavigation() {
             WeatherSplashScreen(navController = navController)
         }
         composable(WeatherScreens.MainScreen.name) {
-            MainScreen(navController = navController)
+            val mainViewModel: MainViewModel = hiltViewModel()
+            MainScreen(navController = navController, mainViewModel)
         }
     }
 }
