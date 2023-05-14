@@ -3,7 +3,11 @@ package ir.adicom.jedbizcard.screens.main
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.produceState
@@ -11,8 +15,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -25,7 +32,7 @@ import ir.adicom.jedbizcard.model.WeatherItem
 import ir.adicom.jedbizcard.utils.formatDate
 import ir.adicom.jedbizcard.utils.formatDateTime
 import ir.adicom.jedbizcard.utils.formatDecimals
-import ir.adicom.jedbizcard.widget.WeatherAppBar
+import ir.adicom.jedbizcard.widget.*
 
 @Composable
 fun MainScreen(navController: NavHostController, mainViewModel: MainViewModel = hiltViewModel()) {
@@ -82,7 +89,7 @@ fun MainContent(data: Weather) {
                 .padding(4.dp)
                 .size(200.dp),
             shape = CircleShape,
-            color = Color.Yellow
+            color = Color(0xFFFFC400)
         ) {
             Column(
                 verticalArrangement = Arrangement.Center,
@@ -100,84 +107,25 @@ fun MainContent(data: Weather) {
         HumidityWindPressureRow(data)
         Divider()
         SunsetSunriseRow(data.list[0])
-    }
-}
-
-@Composable
-fun SunsetSunriseRow(weatherItem: WeatherItem) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 15.dp, bottom = 6.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Row {
-            Icon(
-                painter = painterResource(id = R.drawable.sunrise),
-                contentDescription = "sunrise",
-                modifier = Modifier.size(30.dp)
+        Text(
+            text = "Text",
+            style = MaterialTheme.typography.subtitle1,
+            fontWeight = FontWeight.Bold
+        )
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(),
+            color = Color(0xFFEEF1EF),
+            shape = RoundedCornerShape(
+                CornerSize(14.dp)
             )
-            Text(text = formatDateTime(weatherItem.sunrise), style = MaterialTheme.typography.caption)
-        }
-        Row {
-            Text(text = formatDateTime(weatherItem.sunset), style = MaterialTheme.typography.caption)
-            Icon(
-                painter = painterResource(id = R.drawable.sunset),
-                contentDescription = "sunset",
-                modifier = Modifier.size(30.dp)
-            )
-        }
-    }
-}
-
-@Composable
-fun HumidityWindPressureRow(data: Weather) {
-    Row(
-        modifier = Modifier
-            .padding(12.dp)
-            .fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Row(modifier = Modifier.padding(4.dp)) {
-            Icon(
-                painter = painterResource(id = R.drawable.humidity),
-                contentDescription = "image humidity",
-                modifier = Modifier.size(20.dp)
-            )
-            Text(text = "${data.list[0].humidity} %")
-        }
-        Row(modifier = Modifier.padding(4.dp)) {
-            Icon(
-                painter = painterResource(id = R.drawable.pressure),
-                contentDescription = "image pressure",
-                modifier = Modifier.size(20.dp)
-            )
-            Text(text = "${data.list[0].pressure} psi")
-        }
-        Row(modifier = Modifier.padding(4.dp)) {
-            Icon(
-                painter = painterResource(id = R.drawable.wind),
-                contentDescription = "image wind",
-                modifier = Modifier.size(20.dp)
-            )
-            Text(text = "${data.list[0].speed} mph")
-        }
-    }
-}
-
-@Composable
-fun WeatherStateImage(imageUrl: String) {
-    Image(
-        painter = rememberImagePainter(data = imageUrl, builder = {
-            this.listener(
-                onError = { request, ex ->
-                    Log.e("TAG", "MainContent: ${ex.throwable.message}")
+        ) {
+            LazyColumn(modifier = Modifier.padding(2.dp), contentPadding = PaddingValues(1.dp)) {
+                items(data.list) { weatherItem ->
+                    WeatherDetailRow(weatherItem)
                 }
-            )
-        }),
-        contentDescription = "icon image",
-        modifier = Modifier.size(80.dp)
-    )
+            }
+        }
+    }
 }
