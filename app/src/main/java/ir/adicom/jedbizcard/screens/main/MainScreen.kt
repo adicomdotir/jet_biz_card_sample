@@ -29,6 +29,8 @@ import ir.adicom.jedbizcard.R
 import ir.adicom.jedbizcard.data.DataOrException
 import ir.adicom.jedbizcard.model.Weather
 import ir.adicom.jedbizcard.model.WeatherItem
+import ir.adicom.jedbizcard.navigation.WeatherNavigation
+import ir.adicom.jedbizcard.navigation.WeatherScreens
 import ir.adicom.jedbizcard.utils.formatDate
 import ir.adicom.jedbizcard.utils.formatDateTime
 import ir.adicom.jedbizcard.utils.formatDecimals
@@ -59,7 +61,10 @@ fun MainScaffold(data: Weather, navController: NavHostController) {
         WeatherAppBar(
             title = data.city.name + " ,${data.city.country}",
             navController = navController,
-            elevation = 5.dp
+            elevation = 5.dp,
+            onAddActionClicked = {
+                navController.navigate(WeatherScreens.SearchScreen.name)
+            }
         )
     }) {
         MainContent(data)
