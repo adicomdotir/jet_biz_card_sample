@@ -37,14 +37,18 @@ import ir.adicom.jedbizcard.utils.formatDecimals
 import ir.adicom.jedbizcard.widget.*
 
 @Composable
-fun MainScreen(navController: NavHostController, mainViewModel: MainViewModel = hiltViewModel()) {
+fun MainScreen(
+    navController: NavHostController,
+    mainViewModel: MainViewModel = hiltViewModel(),
+    city: String?
+) {
     val weatherData =
         produceState<DataOrException<Weather, Boolean, Exception>>(
             initialValue = DataOrException(
                 loading = true
             )
         ) {
-            value = mainViewModel.getWeatherData("Ardabil")
+            value = mainViewModel.getWeatherData(city = city!!)
         }.value
 
     if (weatherData.loading == true) {

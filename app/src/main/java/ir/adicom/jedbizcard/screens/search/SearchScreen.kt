@@ -25,6 +25,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import ir.adicom.jedbizcard.navigation.WeatherScreens
 import ir.adicom.jedbizcard.widget.WeatherAppBar
 
 @ExperimentalComposeUiApi
@@ -45,7 +46,14 @@ fun SearchScreen(navController: NavHostController) {
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                SearchBar()
+                SearchBar(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .align(alignment = Alignment.CenterHorizontally)
+                ) {
+                    navController.navigate(WeatherScreens.MainScreen.name + "/$it")
+                }
             }
         }
     }
@@ -54,6 +62,7 @@ fun SearchScreen(navController: NavHostController) {
 @ExperimentalComposeUiApi
 @Composable
 fun SearchBar(
+    modifier: Modifier,
     onSearch: (String) -> Unit = {}
 ) {
     val searchQueryState = rememberSaveable() {
@@ -67,7 +76,12 @@ fun SearchBar(
         CommonTextField(
             valueState = searchQueryState,
             placeholder = "Ardabil",
-            onAction = KeyboardActions {}
+            onAction = KeyboardActions {
+                if (!valid) return@KeyboardActions
+                onSearch(searchQueryState.value.trim())
+                searchQueryState.value = ""
+                keyboardController?.hide()
+            }
         )
     }
 }
