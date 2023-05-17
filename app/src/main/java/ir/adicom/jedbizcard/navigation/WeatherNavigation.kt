@@ -8,9 +8,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import ir.adicom.jedbizcard.screens.about.AboutScreen
+import ir.adicom.jedbizcard.screens.favorites.FavoritesScreen
 import ir.adicom.jedbizcard.screens.main.MainScreen
 import ir.adicom.jedbizcard.screens.main.MainViewModel
 import ir.adicom.jedbizcard.screens.search.SearchScreen
+import ir.adicom.jedbizcard.screens.settings.SettingsScreen
 import ir.adicom.jedbizcard.screens.splash.WeatherSplashScreen
 
 @ExperimentalComposeUiApi
@@ -38,6 +41,18 @@ fun WeatherNavigation() {
 
         composable(WeatherScreens.SearchScreen.name) {
             SearchScreen(navController = navController)
+        }
+
+        composable(WeatherScreens.AboutScreen.name) {
+            AboutScreen(navController = navController)
+        }
+
+        composable(WeatherScreens.FavoriteScreen.name) {
+            FavoritesScreen(navController = navController)
+        }
+
+        composable(WeatherScreens.SettingsScreen.name) {
+            SettingsScreen(navController = navController)
         }
     }
 }
