@@ -1,7 +1,6 @@
 package ir.adicom.jedbizcard.screens.favorites
 
 import android.util.Log
-import androidx.compose.runtime.State
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,29 +12,27 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class FavoriteViewModel @Inject constructor(private val weatherDbRepository: WeatherDbRepository) :
+class FavoriteViewModel @Inject constructor(private val repository: WeatherDbRepository) :
     ViewModel() {
     private val _favList = MutableStateFlow<List<Favorite>>(emptyList())
-    val favList: StateFlow<List<Favorite>> = _favList.asStateFlow()
+    val favList = _favList.asStateFlow()
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            weatherDbRepository.getFavorites().distinctUntilChanged().collect {
-                if (it.isEmpty()) {
-                    Log.e("TAG", ": Empty List")
-                } else {
+            repository.getFavorites()
+                .distinctUntilChanged()
+                .collect {
                     _favList.value = it
                 }
-            }
         }
     }
 
     fun insertFavorite(favorite: Favorite) =
-        viewModelScope.launch { weatherDbRepository.insertFavorite(favorite = favorite) }
+        viewModelScope.launch { repository.insertFavorite(favorite = favorite) }
 
     fun updateFavorite(favorite: Favorite) =
-        viewModelScope.launch { weatherDbRepository.updateFavorite(favorite = favorite) }
+        viewModelScope.launch { repository.updateFavorite(favorite = favorite) }
 
     fun deleteFavorite(favorite: Favorite) =
-        viewModelScope.launch { weatherDbRepository.deleteFavorite(favorite = favorite) }
+        viewModelScope.launch { repository.deleteFavorite(favorite = favorite) }
 }

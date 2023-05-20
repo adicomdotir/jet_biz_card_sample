@@ -1,5 +1,6 @@
 package ir.adicom.jedbizcard.screens.favorites
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -49,6 +50,7 @@ fun FavoritesScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                Log.e("TAG", "FavoritesScreen")
                 val list = favoriteViewModel.favList.collectAsState().value
 
                 LazyColumn() {

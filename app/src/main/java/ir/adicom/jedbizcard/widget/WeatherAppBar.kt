@@ -1,5 +1,8 @@
 package ir.adicom.jedbizcard.widget
 
+import android.content.Context
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -7,15 +10,13 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.rounded.MoreVert
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
@@ -42,6 +43,12 @@ fun WeatherAppBar(
     val showDialog = remember {
         mutableStateOf(false)
     }
+
+    val showIt = remember {
+        mutableStateOf(false)
+    }
+
+    val context = LocalContext.current
 
     if (showDialog.value) {
         ShowSettingDropDownMenu(showDialog, navController)
@@ -80,26 +87,52 @@ fun WeatherAppBar(
                     })
             }
             if (isMainScreen) {
-                Icon(
-                    imageVector = Icons.Default.Favorite,
-                    contentDescription = "favorite icon",
-                    tint = Color.Red,
-                    modifier = Modifier
-                        .scale(0.9f)
-                        .clickable {
-                            val splitTitle = title.split(",")
-                            favoriteViewModel.insertFavorite(
-                                Favorite(
-                                    city = splitTitle[0],
-                                    country = splitTitle[1]
-                                )
-                            )
-                        })
+                val isAlreadyFavList =
+                    favoriteViewModel.favList.collectAsState().value.filter {
+                        it.city == title.split(",")[0] }
+
+                if (isAlreadyFavList.isEmpty()) {
+                    Log.e("TAG", "WeatherAppBar: $isAlreadyFavList", )
+
+                    Icon(
+                        imageVector = Icons.Default.Favorite,
+                        contentDescription = "favorite icon",
+                        tint = Color.Red,
+                        modifier = Modifier
+                            .scale(0.9f)
+                            .clickable {
+                                val splitTitle = title.split(",")
+                                favoriteViewModel
+                                    .insertFavorite(
+                                        Favorite(
+                                            city = splitTitle[0],
+                                            country = splitTitle[1]
+                                        )
+                                    )
+                                    .run {
+                                        showIt.value = true
+                                    }
+                            })
+                } else {
+                    showIt.value = false
+                    Box {
+
+                    }
+                }
+
+                ShowToast(context = context, showIt)
             }
         },
         backgroundColor = Color.Transparent,
         elevation = elevation
     )
+}
+
+@Composable
+fun ShowToast(context: Context, showIt: MutableState<Boolean>) {
+    if (showIt.value) {
+        Toast.makeText(context, "City Added to Favorite", Toast.LENGTH_SHORT).show()
+    }
 }
 
 @Composable
