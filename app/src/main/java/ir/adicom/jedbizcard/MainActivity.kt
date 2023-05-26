@@ -1,221 +1,311 @@
 package ir.adicom.jedbizcard
 
+import android.annotation.SuppressLint
+import android.app.DatePickerDialog
 import android.os.Bundle
+import android.widget.DatePicker
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CornerSize
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.PersonOff
-import androidx.compose.material.icons.sharp.GppGood
-import androidx.compose.runtime.Composable
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.semantics.Role.Companion.Image
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dagger.hilt.android.AndroidEntryPoint
-import ir.adicom.jedbizcard.ui.theme.JedBizCardTheme
+import ir.adicom.jedbizcard.model.Expense
+import ir.adicom.jedbizcard.ui.theme.Purple500
+import kotlinx.coroutines.launch
+import java.sql.Timestamp
+import java.text.SimpleDateFormat
+import java.util.*
 
+@ExperimentalComposeUiApi
+@ExperimentalMaterialApi
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            LoginApp()
+            ExpenseTracker()
         }
     }
 }
 
+@ExperimentalComposeUiApi
+@ExperimentalMaterialApi
 @Composable
-fun LoginApp() {
-    JedBizCardTheme {
-        Surface(modifier = Modifier.fillMaxSize()) {
-            Column(modifier = Modifier.padding(18.dp)) {
-                Row {
-                    Text(text = "Login Account", fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Icon(imageVector = Icons.Default.Person, contentDescription = "person icon")
-                }
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = "Hello , welcome back to our account !",
-                    fontWeight = FontWeight.W400,
-                    fontSize = 13.sp
-                )
-                Spacer(modifier = Modifier.height(46.dp))
-                Surface(
-                    modifier = Modifier
-                        .height(52.dp)
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp)
-                        .border(1.dp, color = Color.Black, shape = RoundedCornerShape(12.dp)),
-                ) {
-                    Row {
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .fillMaxHeight()
-                                .background(
-                                    Color(0xFF6A00BF),
-                                    shape = RoundedCornerShape(
-                                        topStart = 12.dp,
-                                        bottomStart = 12.dp
-                                    )
-                                )
-                        ) {
-                            Text(
-                                text = "Email",
-                                fontWeight = FontWeight.W600,
-                                fontSize = 18.sp,
-                                modifier = Modifier.align(alignment = Alignment.Center),
-                                color = Color.White
-                            )
-                        }
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .align(alignment = Alignment.CenterVertically)
-                        ) {
-                            Text(
-                                text = "Phone Number",
-                                fontWeight = FontWeight.W600,
-                                fontSize = 18.sp,
-                                modifier = Modifier.align(alignment = Alignment.Center)
-                            )
-                        }
-                    }
-                }
+fun ExpenseTracker() {
 
-                Spacer(modifier = Modifier.height(46.dp))
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    val coroutineScope = rememberCoroutineScope()
+    val modalSheetState = rememberModalBottomSheetState(
+        initialValue = ModalBottomSheetValue.Hidden,
+        confirmStateChange = { it != ModalBottomSheetValue.HalfExpanded },
+    )
+    val titleState = remember {
+        mutableStateOf("")
+    }
+    val priceState = remember {
+        mutableStateOf("")
+    }
+    val categoryState = remember {
+        mutableStateOf("")
+    }
+    val context = LocalContext.current
+    val calendar = Calendar.getInstance()
+
+    var selectedDate by remember { mutableStateOf(0L) }
+    val selectedDateText = remember() {
+        mutableStateOf("")
+    }
+
+    val year = calendar[Calendar.YEAR]
+    val month = calendar[Calendar.MONTH]
+    val dayOfMonth = calendar[Calendar.DAY_OF_MONTH]
+
+    val datePicker = DatePickerDialog(
+        context,
+        { _: DatePicker, selectedYear: Int, selectedMonth: Int, selectedDayOfMonth: Int ->
+            val calendar = Calendar.getInstance()
+            calendar.set(selectedYear, selectedMonth, selectedDayOfMonth)
+            selectedDate = calendar.timeInMillis
+            val sdf = SimpleDateFormat("yyyy/MM/dd")
+            selectedDateText.value = sdf.format(Timestamp(calendar.timeInMillis))
+        }, year, month, dayOfMonth
+    )
+
+    val expenses = remember {
+        mutableStateListOf<Expense>()
+    }
+
+    ModalBottomSheetLayout(
+        sheetState = modalSheetState,
+        sheetContent = {
+            val height = LocalConfiguration.current.screenHeightDp
+            Column(
+                modifier = Modifier
+                    .verticalScroll(rememberScrollState())
+                    .height((height * 0.5).dp)
+                    .padding(16.dp)
+            ) {
                 OutlinedTextField(
-                    value = "",
-                    onValueChange = {},
+                    value = titleState.value,
+                    onValueChange = {
+                        titleState.value = it
+                    },
                     modifier = Modifier.fillMaxWidth(),
-                    label = {
-                        Text(text = "Email address", fontWeight = FontWeight.W400, fontSize = 14.sp)
-                    })
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(
+                        onDone = { keyboardController?.hide() }
+                    ),
+                    label = { Text(text = "Title") })
+                Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(
-                    value = "",
-                    onValueChange = {},
+                    value = priceState.value.toString(),
+                    onValueChange = {
+                        if (it.isNotEmpty()) {
+                            priceState.value = it
+                        }
+                    },
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = { keyboardController?.hide() }
+                    ),
                     modifier = Modifier.fillMaxWidth(),
-                    label = {
-                        Text(text = "Password", fontWeight = FontWeight.W400, fontSize = 14.sp)
-                    })
-                TextButton(
-                    onClick = { /*TODO*/ },
-                    modifier = Modifier.align(alignment = Alignment.End)
-                ) {
-                    Text(text = "Forgot Password?", fontWeight = FontWeight.W400, fontSize = 14.sp)
-                }
-                Spacer(modifier = Modifier.height(36.dp))
-                Surface(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(55.dp),
-                    color = Color(0xFF190152),
-                    shape = RoundedCornerShape(CornerSize(12.dp))
-                ) {
-                    Column(
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        Text(
-                            text = "Login",
-                            fontWeight = FontWeight.W600,
-                            fontSize = 18.sp,
-                            color = Color.White
-                        )
-                    }
-                }
-                Spacer(modifier = Modifier.height(36.dp))
-                Row {
-                    Box(
-                        modifier =
-                        Modifier
-                            .weight(1f)
-                            .align(alignment = Alignment.CenterVertically)
-                    ) {
-                        Divider()
-                    }
-                    Box {
-                        Text(
-                            text = "Or sign up with",
-                            fontWeight = FontWeight.W400,
-                            fontSize = 12.sp,
-                        )
-                    }
-                    Box(
-                        modifier =
-                        Modifier
-                            .weight(1f)
-                            .align(alignment = Alignment.CenterVertically)
-                    ) {
-                        Divider()
-                    }
-                }
-                Spacer(modifier = Modifier.height(36.dp))
+                    label = { Text(text = "Price") })
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = categoryState.value,
+                    onValueChange = {
+                        categoryState.value = it
+                    },
+
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = { keyboardController?.hide() }
+                    ),
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text(text = "Category") })
+                Spacer(modifier = Modifier.height(8.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center,
+                    horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Image(
-                        painter = painterResource(R.drawable.ic_google),
-                        contentDescription = null,
-                        modifier = Modifier.size(22.dp, 22.dp)
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
                     Text(
-                        text = "Google",
-                        fontWeight = FontWeight.W500,
-                        fontSize = 14.sp,
+                        text = if (selectedDate == 0L) {
+                            "Please pick a date"
+                        } else {
+                            selectedDateText.value
+                        }
                     )
+                    Button(
+                        onClick = {
+                            datePicker.show()
+                        }
+                    ) {
+                        Text(text = "Select a date")
+                    }
                 }
-                Spacer(modifier = Modifier.height(36.dp))
-                Text(text = buildAnnotatedString {
-                    withStyle(
-                        style = SpanStyle(
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.W400,
-                            color = Color(0xFF636363)
-                        )
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
+                    Button(
+                        onClick = {
+                            if (
+                                selectedDate != 0L &&
+                                titleState.value.isNotEmpty() &&
+                                priceState.value.isNotEmpty() &&
+                                categoryState.value.isNotEmpty()
+                            ) {
+                                expenses.add(
+                                    Expense(
+                                        expenses.size + 1,
+                                        titleState.value,
+                                        priceState.value.toInt(),
+                                        categoryState.value,
+                                        selectedDate
+                                    )
+                                )
+                                selectedDate = 0L
+                                titleState.value = ""
+                                categoryState.value = ""
+                                priceState.value = ""
+                                coroutineScope.launch {
+                                    modalSheetState.hide()
+                                }
+                                keyboardController?.hide()
+                            }
+                        }
                     ) {
-                        append("Not register yet? ")
+                        Text(text = "Save")
                     }
-                    withStyle(
-                        style = SpanStyle(
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.W600,
-                            color = Color.Black
-                        )
+                    Button(
+                        onClick = {
+                            coroutineScope.launch { modalSheetState.hide() }
+                            keyboardController?.hide()
+                        }
                     ) {
-                        append("Create Account")
+                        Text(text = "Cancel")
                     }
-                }, modifier = Modifier.align(alignment = Alignment.CenterHorizontally))
+                }
+            }
+        }
+    ) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Text(text = "Expense App")
+                    },
+                    actions = {
+                        IconButton(onClick = {
+
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.MoreVert,
+                                contentDescription = "more vert"
+                            )
+                        }
+                    }
+                )
+            },
+            floatingActionButton = {
+                FloatingActionButton(
+                    modifier = Modifier,
+                    backgroundColor = Purple500,
+                    onClick = {
+                        coroutineScope.launch {
+                            if (modalSheetState.isVisible)
+                                modalSheetState.hide()
+                            else
+                                modalSheetState.animateTo(ModalBottomSheetValue.Expanded)
+                        }
+                    }
+                ) {
+                    Icon(imageVector = Icons.Filled.Add, contentDescription = "Add")
+                }
+            }
+        ) {
+            Surface(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                LazyColumn() {
+                    items(expenses) { item ->
+                        ExpenseRow(item)
+                    }
+                }
             }
         }
     }
+
 }
 
+//@Preview
+@SuppressLint("SimpleDateFormat")
+@Composable
+fun ExpenseRow(
+    expense: Expense = Expense(1, "Title", 100, "Food", System.currentTimeMillis())
+) {
+    Card(modifier = Modifier.padding(8.dp), elevation = 8.dp) {
+        Column(modifier = Modifier.padding(8.dp)) {
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                Text(text = expense.title, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Text(text = "$" + expense.amount.toString())
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                Text(text = expense.category)
+                val sdf = SimpleDateFormat("yyyy/MM/dd")
+                Text(text = sdf.format(Timestamp(expense.date)))
+            }
+        }
 
-@Preview(showBackground = true)
+    }
+}
+
+@ExperimentalComposeUiApi
+@ExperimentalMaterialApi
+@Preview
 @Composable
 fun DefaultPreview() {
-    LoginApp()
+    ExpenseTracker()
 }
