@@ -1,11 +1,15 @@
 package ir.adicom.jedbizcard
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.DatePickerDialog
 import android.os.Bundle
+import android.util.Log
 import android.widget.DatePicker
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -33,6 +37,7 @@ import androidx.compose.ui.unit.sp
 import dagger.hilt.android.AndroidEntryPoint
 import ir.adicom.jedbizcard.model.Expense
 import ir.adicom.jedbizcard.ui.theme.Purple500
+import ir.adicom.jedbizcard.widgets.CustomAlertDialog
 import kotlinx.coroutines.launch
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
@@ -262,7 +267,9 @@ fun ExpenseTracker() {
             ) {
                 LazyColumn() {
                     items(expenses) { item ->
-                        ExpenseRow(item)
+                        ExpenseRow(item, onRemove = {
+                            expenses.remove(it)
+                        })
                     }
                 }
             }
@@ -272,12 +279,24 @@ fun ExpenseTracker() {
 }
 
 //@Preview
+@OptIn(ExperimentalFoundationApi::class)
 @SuppressLint("SimpleDateFormat")
 @Composable
 fun ExpenseRow(
-    expense: Expense = Expense(1, "Title", 100, "Food", System.currentTimeMillis())
+    expense: Expense = Expense(1, "Title", 100, "Food", System.currentTimeMillis()),
+    onRemove: (Expense) -> Unit
 ) {
-    Card(modifier = Modifier.padding(8.dp), elevation = 8.dp) {
+    val context = LocalContext.current
+    var showCustomDialog by remember {
+        mutableStateOf(false)
+    }
+
+    Card(modifier = Modifier
+        .padding(8.dp)
+        .combinedClickable(onLongClick = {
+            showCustomDialog = !showCustomDialog
+        }) {}, elevation = 8.dp
+    ) {
         Column(modifier = Modifier.padding(8.dp)) {
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -299,6 +318,18 @@ fun ExpenseRow(
             }
         }
 
+    }
+
+    if (showCustomDialog) {
+        CustomAlertDialog(
+            onDismiss = {
+                showCustomDialog = !showCustomDialog
+            },
+            onYesAction = {
+                onRemove(expense)
+                showCustomDialog = !showCustomDialog
+            }
+        )
     }
 }
 
