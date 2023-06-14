@@ -8,6 +8,9 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import ir.adicom.jedbizcard.database.AppDatabase
 import ir.adicom.jedbizcard.database.UserDao
+import ir.adicom.jedbizcard.features.authentication.data.data_sources.DataSource
+import ir.adicom.jedbizcard.features.authentication.data.repositories.UserRepositoryImpl
+import ir.adicom.jedbizcard.features.authentication.domain.repositories.UserRepository
 import javax.inject.Singleton
 
 @Module
@@ -27,5 +30,11 @@ object AppModule {
     @Singleton
     fun providesUserDao(appDatabase: AppDatabase): UserDao {
         return appDatabase.userDao()
+    }
+
+    @Provides
+    @Singleton
+    fun providesUserRepository(dataSource: DataSource): UserRepository {
+        return UserRepositoryImpl(dataSource = dataSource)
     }
 }

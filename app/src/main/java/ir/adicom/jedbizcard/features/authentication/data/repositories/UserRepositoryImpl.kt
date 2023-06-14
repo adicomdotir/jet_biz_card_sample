@@ -4,8 +4,9 @@ import ir.adicom.jedbizcard.database.UserEntity
 import ir.adicom.jedbizcard.features.authentication.data.data_sources.DataSource
 import ir.adicom.jedbizcard.features.authentication.domain.models.User
 import ir.adicom.jedbizcard.features.authentication.domain.repositories.UserRepository
+import javax.inject.Inject
 
-class UserRepositoryImpl(private val dataSource: DataSource) : UserRepository {
+class UserRepositoryImpl @Inject constructor(private val dataSource: DataSource) : UserRepository {
     override suspend fun insertUser(user: User) {
         dataSource.insertUser(
             UserEntity(

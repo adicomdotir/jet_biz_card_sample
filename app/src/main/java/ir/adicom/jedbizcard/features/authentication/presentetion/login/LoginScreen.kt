@@ -8,10 +8,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import ir.adicom.jedbizcard.features.authentication.domain.models.User
 
 @Preview
 @Composable
 fun LoginScreen() {
+    val viewModel: LoginViewModel = hiltViewModel()
     Scaffold(
         topBar = {
             TopAppBar {
@@ -45,7 +48,10 @@ fun LoginScreen() {
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(16.dp))
-            Button(onClick = { }) {
+            Button(onClick = {
+                val user = User(id = 0, username = "admin", password = "123")
+
+            }) {
                 Text(text = "Login")
             }
             TextButton(onClick = { }) {
