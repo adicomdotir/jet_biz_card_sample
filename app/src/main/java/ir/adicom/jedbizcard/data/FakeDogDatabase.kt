@@ -4,7 +4,7 @@ import ir.adicom.jedbizcard.model.Player
 import ir.adicom.jedbizcard.model.PositionType
 
 object FakePlayerDatabase {
-    val playerList = listOf<Player>(
+    val playerList = mutableListOf(
         Player(1, "Ali", "Pinto", 17, 85, 91, 70, PositionType.GK),
         Player(2, "Ali", "Coppola", 17, 85, 91, 70, PositionType.RB),
         Player(3, "Ali", "Wyatt", 17, 85, 91, 70, PositionType.LB),
