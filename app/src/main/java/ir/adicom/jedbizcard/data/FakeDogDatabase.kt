@@ -14,4 +14,12 @@ object FakePlayerDatabase {
         Player(7, "Ali", "Colombo", 17, 85, 91, 70, PositionType.CF),
         Player(8, "Cristiano", "Ronaldo", 17, 85, 91, 70, PositionType.CF),
     )
+
+    fun removePlayer(player: Player): Boolean {
+        return try {
+            playerList.remove(player)
+        } catch (e: Exception) {
+            false
+        }
+    }
 }

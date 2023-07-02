@@ -34,7 +34,11 @@ fun Details(navController: NavController, id: Int) {
                         Icon(Icons.Filled.ArrowBack, null)
                     }
                 }, actions = {
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(onClick = {
+                        if (FakePlayerDatabase.removePlayer(player)) {
+                            navController.popBackStack()
+                        }
+                    }) {
                         Icon(Icons.Filled.Delete, null, tint = Color.White)
 
                     }
