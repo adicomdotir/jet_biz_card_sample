@@ -16,7 +16,7 @@ import ir.adicom.jedbizcard.data.FakePlayerDatabase
 
 @Composable
 fun Details(navController: NavController, id: Int) {
-    val player = FakePlayerDatabase.playerList.last {
+    val player = FakePlayerDatabase.playerList.find {
         it.id == id
     }
     Scaffold(
@@ -34,11 +34,13 @@ fun Details(navController: NavController, id: Int) {
                         Icon(Icons.Filled.ArrowBack, null)
                     }
                 }, actions = {
-                    IconButton(onClick = {
-                        if (FakePlayerDatabase.removePlayer(player)) {
-                            navController.popBackStack()
+                    IconButton(
+                        onClick = {
+                            if (FakePlayerDatabase.removePlayer(player!!)) {
+                                navController.popBackStack()
+                            }
                         }
-                    }) {
+                    ) {
                         Icon(Icons.Filled.Delete, null, tint = Color.White)
 
                     }
@@ -50,13 +52,13 @@ fun Details(navController: NavController, id: Int) {
                 .fillMaxWidth()
                 .padding(8.dp)
         ) {
-            Text(text = "Position: ${player.position}")
-            Text(text = "FirstName: ${player.firstName}")
-            Text(text = "LastName: ${player.lastName}")
-            Text(text = "Age: ${player.age}")
-            Text(text = "Overall: ${player.overall}")
-            Text(text = "Min Potential: ${player.min_potential}")
-            Text(text = "Max Potential: ${player.max_potential}")
+            Text(text = "Position: ${player?.position}")
+            Text(text = "FirstName: ${player?.firstName}")
+            Text(text = "LastName: ${player?.lastName}")
+            Text(text = "Age: ${player?.age}")
+            Text(text = "Overall: ${player?.overall}")
+            Text(text = "Min Potential: ${player?.min_potential}")
+            Text(text = "Max Potential: ${player?.max_potential}")
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween

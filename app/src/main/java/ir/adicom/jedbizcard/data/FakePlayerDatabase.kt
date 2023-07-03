@@ -17,7 +17,16 @@ object FakePlayerDatabase {
 
     fun removePlayer(player: Player): Boolean {
         return try {
-            playerList.remove(player)
+            var idx: Int = 0
+            var removePlayerIdx = 0
+            playerList.forEach {
+                if (it.id == player.id) {
+                    removePlayerIdx = idx
+                }
+                idx++
+            }
+            playerList.removeAt(removePlayerIdx)
+            true
         } catch (e: Exception) {
             false
         }
