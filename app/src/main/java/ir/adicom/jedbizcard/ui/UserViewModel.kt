@@ -17,4 +17,12 @@ class UserViewModel(private val userRepository: UserRepository) {
         }
 
     }
+
+    fun getUser() {
+        GlobalScope.launch {
+            user.apply {
+                userRepository.getUser(1)
+            }
+        }
+    }
 }
