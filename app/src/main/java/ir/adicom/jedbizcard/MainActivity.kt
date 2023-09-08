@@ -3,17 +3,19 @@ package ir.adicom.jedbizcard
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -21,39 +23,31 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private val fakeData: ArrayList<ParentDataClass> = arrayListOf()
+    private val fakeData: ArrayList<String> = arrayListOf(
+        "Java",
+        "JavaScript",
+        "C#",
+        "C++",
+        "Dart",
+        "Kotlin",
+        "Swift",
+        "Go",
+        "PHP",
+        "Rust",
+        "Ruby",
+        "TypeScript",
+        "Objective-C",
+        "Ruby",
+        "Perl",
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            setFakeData()
             MyApp(fakeData)
         }
     }
-
-    private fun setFakeData() {
-        val images = listOf<ChildDataClass>(
-            ChildDataClass(R.drawable.movie_01),
-            ChildDataClass(R.drawable.movie_02),
-            ChildDataClass(R.drawable.movie_03),
-            ChildDataClass(R.drawable.movie_04),
-            ChildDataClass(R.drawable.movie_05),
-            ChildDataClass(R.drawable.movie_06),
-            ChildDataClass(R.drawable.movie_07),
-        )
-
-        fakeData.add(ParentDataClass("Best", images))
-        fakeData.add(ParentDataClass("Favorite", images.shuffled()))
-        fakeData.add(ParentDataClass("Random", images.shuffled()))
-        fakeData.add(ParentDataClass("Others", images.shuffled()))
-        fakeData.add(ParentDataClass("x-rated", images.shuffled()))
-        fakeData.add(ParentDataClass("Unknown", images.shuffled()))
-    }
 }
-
-data class ParentDataClass(val title: String, val images: List<ChildDataClass>)
-
-data class ChildDataClass(val image: Int)
 
 @Preview
 @Composable
@@ -61,7 +55,7 @@ fun DefaultPreview() {
 }
 
 @Composable
-fun MyApp(fakeData: ArrayList<ParentDataClass>) {
+fun MyApp(fakeData: ArrayList<String>) {
 
     Scaffold(
         topBar = {
@@ -81,31 +75,48 @@ fun MyApp(fakeData: ArrayList<ParentDataClass>) {
             }
         }
     ) {
-        LazyColumn() {
-            items(fakeData.size) {
-                CartUi(fakeData, it)
+        Column(modifier = Modifier.fillMaxSize()) {
+            val state = remember {
+                mutableStateOf(TextFieldValue())
+            }
+            TextFieldUi(state)
+            LazyColumn() {
+                items(
+                    fakeData.filter { it.contains(state.value.text, ignoreCase = true) },
+                    key = { it }) { item ->
+                    CartUi(item)
+                }
             }
         }
     }
 }
 
 @Composable
-fun CartUi(fakeData: ArrayList<ParentDataClass>, i: Int) {
+fun TextFieldUi(state: MutableState<TextFieldValue>) {
+    TextField(
+        value = state.value, onValueChange = {
+            state.value = it
+        }, modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .clip(RoundedCornerShape(24.dp))
+            .border(2.dp, Color.DarkGray, RoundedCornerShape(24.dp)),
+        colors = TextFieldDefaults.textFieldColors(
+            backgroundColor = Color.White,
+        )
+    )
+}
+
+@Composable
+fun CartUi(item: String) {
     Card(
         backgroundColor = Color.LightGray,
-        modifier = Modifier.padding(8.dp)
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth()
     ) {
-        Column {
-            Text(text = fakeData[i].title, fontSize = 24.sp)
-            LazyRow() {
-                items(fakeData[i].images.size) {
-                    Image(
-                        painter = painterResource(id = fakeData[i].images[it].image),
-                        contentDescription = "",
-                        modifier = Modifier.padding(8.dp)
-                    )
-                }
-            }
+        Column(modifier = Modifier.padding(8.dp)) {
+            Text(text = item, fontSize = 24.sp)
         }
     }
 }
