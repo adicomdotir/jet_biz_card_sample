@@ -1,5 +1,6 @@
 package ir.adicom.jedbizcard
 
+<<<<<<< HEAD
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -69,3 +70,5 @@ fun VideoPostItem() {
 fun VideoPostItemPreview() {
     VideoPostItem()
 }
+=======
+>>>>>>> ae7fffe08842f040a2146f7d474ac29a64d2c3c9
