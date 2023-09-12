@@ -4,6 +4,9 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -37,88 +40,44 @@ fun DefaultPreview() {
 }
 
 @Composable
-fun MyApp() {
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(text = "MyApp")
-                }
-            )
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-
-                },
-            ) {
-                Icon(imageVector = Icons.Filled.Add, contentDescription = "add")
-            }
-        }
+private fun MyApp(modifier: Modifier = Modifier) {
+    Surface(
+        modifier = modifier,
+        color = MaterialTheme.colors.background
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            val redColorTextField = remember {
-                mutableStateOf(TextFieldValue("0"))
-            }
-            val greenColorTextField = remember {
-                mutableStateOf(TextFieldValue("0"))
-            }
-            val blueColorTextField = remember {
-                mutableStateOf(TextFieldValue("0"))
-            }
-            OutlinedTextField(
-                value = redColorTextField.value,
-                onValueChange = {
-                    redColorTextField.value = it
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
-            OutlinedTextField(
-                value = greenColorTextField.value,
-                onValueChange = {
-                    greenColorTextField.value = it
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
-            OutlinedTextField(
-                value = blueColorTextField.value,
-                onValueChange = {
-                    blueColorTextField.value = it
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Text(
-                text = convertToHex(
-                    redColorTextField.value.text,
-                    greenColorTextField.value.text,
-                    blueColorTextField.value.text
-                ).uppercase(Locale.ROOT)
-            )
-
-            Box(
-                modifier = Modifier
-                    .size(100.dp)
-                    .background(
-                        Color(
-                            redColorTextField.value.text.toInt(),
-                            greenColorTextField.value.text.toInt(),
-                            blueColorTextField.value.text.toInt()
-                        )
-                    )
-            ) {
-
-            }
-        }
+        Greeting("Android")
     }
 }
 
-fun convertToHex(red: String, green: String, blue: String): String {
-    return "${red.toInt().toString(16)}${green.toInt().toString(16)}${blue.toInt().toString(16)}"
+@Composable
+private fun Greeting(name: String) {
+    var expanded by remember { mutableStateOf(false) }
+    val extraPadding by animateDpAsState(
+        if (expanded) 48.dp else 0.dp,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        )
+    )
+
+    Surface(
+        color = MaterialTheme.colors.primary,
+        modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
+    ) {
+        Row(modifier = Modifier.padding(24.dp)) {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(bottom = extraPadding)
+            ) {
+                Text(text = "Hello,")
+                Text(text = "$name")
+            }
+            Button(
+                onClick = { expanded = !expanded }
+            ) {
+                Text(if (expanded) "Show less" else "Show more")
+            }
+        }
+    }
 }
