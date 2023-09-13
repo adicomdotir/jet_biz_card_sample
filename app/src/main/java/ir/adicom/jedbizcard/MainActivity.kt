@@ -13,6 +13,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.TextFieldValue
@@ -41,43 +42,59 @@ fun DefaultPreview() {
 
 @Composable
 private fun MyApp(modifier: Modifier = Modifier) {
-    Surface(
-        modifier = modifier,
-        color = MaterialTheme.colors.background
-    ) {
-        Greeting("Android")
-    }
-}
+//    Row(
+//        modifier = Modifier.fillMaxWidth().padding(8.dp).background(Color.DarkGray),
+//        verticalAlignment = Alignment.CenterVertically
+//    ) {
+//        Text(
+//            text = "Pizza",
+//            style = MaterialTheme.typography.h4,
+//            modifier = Modifier.padding(start = 20.dp)
+//        )
+//        Text(
+//            text = "$5",
+//            style = MaterialTheme.typography.h6,
+//            modifier = Modifier.padding(start = 20.dp)
+//        )
+//    }
 
-@Composable
-private fun Greeting(name: String) {
-    var expanded by remember { mutableStateOf(false) }
-    val extraPadding by animateDpAsState(
-        if (expanded) 48.dp else 0.dp,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow
-        )
-    )
+//    Column(
+//        modifier = Modifier
+//            .fillMaxSize()
+//            .background(MaterialTheme.colors.surface),
+//        horizontalAlignment = Alignment.CenterHorizontally
+//    ) {
+//        Text(
+//            text = "Column Layout",
+//            style = MaterialTheme.typography.h4,
+//            color = MaterialTheme.colors.primary
+//        )
+//        Text(
+//            text = "Pizza",
+//            style = MaterialTheme.typography.h6,
+//            color = MaterialTheme.colors.primary
+//        )
+//        Text(
+//            text = "$5",
+//            style = MaterialTheme.typography.h6,
+//            color = MaterialTheme.colors.primary
+//        )
+//    }
 
-    Surface(
-        color = MaterialTheme.colors.primary,
-        modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(140.dp)
+            .background(Color.Green)
     ) {
-        Row(modifier = Modifier.padding(24.dp)) {
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(bottom = extraPadding)
-            ) {
-                Text(text = "Hello,")
-                Text(text = "$name")
-            }
-            Button(
-                onClick = { expanded = !expanded }
-            ) {
-                Text(if (expanded) "Show less" else "Show more")
-            }
-        }
+        Text(text = "Top Start", modifier = Modifier.align(Alignment.TopStart))
+        Text(text = "Top Center", modifier = Modifier.align(Alignment.TopCenter))
+        Text(text = "Top End", modifier = Modifier.align(Alignment.TopEnd))
+        Text(text = "Center Start", modifier = Modifier.align(Alignment.CenterStart))
+        Text(text = "Center", modifier = Modifier.align(Alignment.Center))
+        Text(text = "Center End", modifier = Modifier.align(Alignment.CenterEnd))
+        Text(text = "Bottom Start", modifier = Modifier.align(Alignment.BottomStart))
+        Text(text = "Bottom Center", modifier = Modifier.align(Alignment.BottomCenter))
+        Text(text = "Bottom End", modifier = Modifier.align(Alignment.BottomEnd))
     }
 }
