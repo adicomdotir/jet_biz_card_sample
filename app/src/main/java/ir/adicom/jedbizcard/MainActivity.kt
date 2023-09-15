@@ -47,6 +47,10 @@ fun DefaultPreview() {
 
 @Composable
 private fun MyApp(modifier: Modifier = Modifier) {
+    var counter by remember {
+        mutableStateOf(0)
+    }
+
     val gradientBrush = Brush.horizontalGradient(
         colors = listOf(Color(0xFFFD5356), Color(0xFFFF6EAA)),
         startX = 0f,
