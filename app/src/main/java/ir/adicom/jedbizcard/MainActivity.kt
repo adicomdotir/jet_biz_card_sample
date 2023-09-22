@@ -8,10 +8,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.material.Button
 import androidx.compose.material.Checkbox
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.RadioButton
 import androidx.compose.material.Switch
 import androidx.compose.material.Text
@@ -46,24 +49,24 @@ fun DefaultPreview() {
 
 @Composable
 private fun MyApp(modifier: Modifier = Modifier) {
-    var switchValue by remember {
-        mutableStateOf(false)
-    }
-    var checkboxValue by remember {
-        mutableStateOf(false)
+    var indicatorPercent by remember {
+        mutableStateOf(0.5f)
     }
 
-    Column {
-        Switch(
-            checked = switchValue,
-            onCheckedChange = {
-                switchValue = it
-            }
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        CircularProgressIndicator(
+            progress = indicatorPercent
         )
-        Checkbox(
-            checked = checkboxValue, onCheckedChange = {
-                checkboxValue = it
+        Button(
+            onClick = {
+                indicatorPercent += 0.1f
             }
-        )
+        ) {
+            Text(text = "Increase Progress")
+        }
     }
 }
